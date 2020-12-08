@@ -1,65 +1,58 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Layout from '../components/Layout'
+import Link from 'next/link'
 
-export default function Home() {
+
+export async function getStaticProps(){
+  
+  
+    try{
+    const result = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=ba7b678a113f487b1d9d3c66cba0cfc8&language=en-US`)
+    const {results} = await result.json()
+    const movie = results.map((res, index) =>{
+    const imageUrl = res.poster_path
+      return{
+        ...res,
+        imageUrl
+      }
+    })
+    
+    return{
+    props:{movie}
+  }
+
+
+
+    }catch(error){
+      console.log(error);
+
+    }
+
+    
+  }
+
+export default function Home({movie}) {
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+    <Layout title="movies now playing">     
+        <h1 className="text-4xl mt-8 mb-10 text-center text-indigo-light font-mono ... capitalize ..." >
+         movies now playing        
+        </h1>  
+      <ul className="grid grid-cols-3 gap-6">
+        {
+          movie.map((item, index)=>{
+            return (<li key={index}>
+              <Link href={`/movie/?id=${item.id}`}>
+                
+                  <a className="mb-10 cursor-pointer text-indigo-light text-center font-mono ... ">
+                  <img className="border-2 border-indigo-dark hover:border-indigo-light" src={`https://image.tmdb.org/t/p/w500${item.imageUrl}`} alt={item.original_title}/>
+                  <p className="bg-indigo-default hover:bg-indigo-dark">{item.original_title}</p>
+                  </a>
+                               
+              </Link>
+            </li>)
+          })
+        }
+        </ul>   
+    </Layout>
+   
   )
 }
